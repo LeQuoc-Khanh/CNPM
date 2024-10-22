@@ -1,0 +1,100 @@
+// Model cho nhân viên
+public class Employee
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+    public string Phone { get; set; }
+    public string Position { get; set; }
+}
+
+// Giao diện - Trang quản lý nhân viên (Admin Input)
+public class EmployeeManagementPage
+{
+    public void AddEmployee()
+    {
+        // Admin nhập thông tin nhân viên
+        Console.WriteLine("Nhập tên nhân viên:");
+        string name = Console.ReadLine();
+
+        Console.WriteLine("Nhập email:");
+        string email = Console.ReadLine();
+
+        Console.WriteLine("Nhập số điện thoại:");
+        string phone = Console.ReadLine();
+
+        Console.WriteLine("Nhập chức vụ:");
+        string position = Console.ReadLine();
+
+        // Gửi đến Controller
+        EmployeeController controller = new EmployeeController();
+        string result = controller.SaveEmployee(new Employee
+        {
+            Name = name,
+            Email = email,
+            Phone = phone,
+            Position = position
+        });
+
+        // Hiển thị kết quả
+        Console.WriteLine(result);
+    }
+}
+
+// Controller xử lý logic
+public class EmployeeController
+{
+    public string SaveEmployee(Employee employee)
+    {
+        // Kiểm tra thông tin hợp lệ
+        if (string.IsNullOrEmpty(employee.Name) || string.IsNullOrEmpty(employee.Email))
+        {
+            return "Thông tin không hợp lệ.";
+        }
+
+        // Gửi đến DAL để lưu vào CSDL
+        EmployeeDAL dal = new EmployeeDAL();
+        bool isSaved = dal.AddEmployee(employee);
+
+        if (isSaved)
+        {
+            return "Thêm nhân viên thành công!";
+        }
+        else
+        {
+            return "Có lỗi xảy ra khi thêm nhân viên.";
+        }
+    }
+}
+
+// DAL - Giao tiếp với cơ sở dữ liệu
+public class EmployeeDAL
+{
+    public bool AddEmployee(Employee employee)
+    {
+        try
+        {
+            // Câu lệnh SQL thêm nhân viên mới vào CSDL
+            string query = "INSERT INTO Employees (Name, Email, Phone, Position) VALUES (@Name, @Email, @Phone, @Position)";
+
+            using (SqlConnection conn = new SqlConnection("YourConnectionString"))
+            {
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Name", employee.Name);
+                cmd.Parameters.AddWithValue("@Email", employee.Email);
+                cmd.Parameters.AddWithValue("@Phone", employee.Phone);
+                cmd.Parameters.AddWithValue("@Position", employee.Position);
+
+                conn.Open();
+                int rowsAffected = cmd.ExecuteNonQuery();
+
+                return rowsAffected > 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Lỗi: " + ex.Message);
+            return false;
+        }
+    }
+}
