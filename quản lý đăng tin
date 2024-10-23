@@ -1,0 +1,94 @@
+using System;
+using System.Collections.Generic;
+
+public class Post
+{
+    public int PostId { get; set; }
+    public string Title { get; set; }
+    public string Content { get; set; }
+    public DateTime PostDate { get; set; }
+    public bool IsApproved { get; set; } // Tin đã được kiểm duyệt hay chưa
+    public string Package { get; set; } // Gói đăng tin (ví dụ: cơ bản, cao cấp)
+    public string Promotion { get; set; } // Khuyến mãi, quảng cáo liên quan
+
+    public Post(int postId, string title, string content)
+    {
+        PostId = postId;
+        Title = title;
+        Content = content;
+        PostDate = DateTime.Now;
+        IsApproved = false; // Mặc định tin chưa được kiểm duyệt
+        Package = "Basic";  // Gói đăng tin mặc định
+        Promotion = null;   // Không có khuyến mãi mặc định
+    }
+}
+
+public class PostManager
+{
+    private List<Post> posts = new List<Post>(); // Danh sách tin đăng giả lập cơ sở dữ liệu
+
+    // 1. Kiểm duyệt tin đăng quảng cáo
+    public void ApprovePost(int postId)
+    {
+        Post post = posts.Find(p => p.PostId == postId);
+        if (post != null)
+        {
+            post.IsApproved = true;
+            Console.WriteLine($"Tin đăng '{post.Title}' đã được duyệt.");
+        }
+        else
+        {
+            Console.WriteLine("Không tìm thấy tin đăng.");
+        }
+    }
+
+    // 2. Quản lý gói đăng tin (ví dụ: Basic, Premium)
+    public void ManagePostPackage(int postId, string package)
+    {
+        Post post = posts.Find(p => p.PostId == postId);
+        if (post != null)
+        {
+            post.Package = package;
+            Console.WriteLine($"Tin đăng '{post.Title}' đã được chuyển sang gói: {package}");
+        }
+        else
+        {
+            Console.WriteLine("Không tìm thấy tin đăng.");
+        }
+    }
+
+    // 3. Quản lý quảng cáo và khuyến mãi
+    public void ManagePromotions(int postId, string promotion)
+    {
+        Post post = posts.Find(p => p.PostId == postId);
+        if (post != null)
+        {
+            post.Promotion = promotion;
+            Console.WriteLine($"Áp dụng khuyến mãi '{promotion}' cho tin đăng: {post.Title}");
+        }
+        else
+        {
+            Console.WriteLine("Không tìm thấy tin đăng.");
+        }
+    }
+
+    // Thêm tin đăng mới
+    public void AddPost(string title, string content)
+    {
+        int newPostId = posts.Count + 1;
+        Post newPost = new Post(newPostId, title, content);
+        posts.Add(newPost);
+        Console.WriteLine($"Tin đăng '{title}' đã được thêm với ID: {newPostId}");
+    }
+
+    // Hiển thị danh sách tin đăng
+    public void DisplayPosts()
+    {
+        Console.WriteLine("Danh sách tin đăng:");
+        foreach (var post in posts)
+        {
+            Console.WriteLine($"ID: {post.PostId}, Tiêu đề: {post.Title}, Gói: {post.Package}, Đã duyệt: {(post.IsApproved ? "Có" : "Không")}, Khuyến mãi: {post.Promotion ?? "Không có"}");
+        }
+    }
+}
+
