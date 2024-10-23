@@ -1,0 +1,79 @@
+using System;
+using System.Collections.Generic;
+
+public class User
+{
+    public int UserId { get; set; }
+    public string UserName { get; set; }
+    public string Password { get; set; }
+    public string Role { get; set; } // Vai trò người dùng: Admin, Member, etc.
+    public string Email { get; set; }
+    public bool IsActive { get; set; }
+
+    public User(int userId, string userName, string password, string role, string email)
+    {
+        UserId = userId;
+        UserName = userName;
+        Password = password;
+        Role = role;
+        Email = email;
+        IsActive = true;
+    }
+}
+
+public class UserManager
+{
+    private List<User> users = new List<User>(); // Danh sách người dùng giả lập cơ sở dữ liệu
+
+    // 1. Tạo tài khoản thành viên
+    public void CreateUser(string userName, string password, string email)
+    {
+        int newUserId = users.Count + 1; // Sinh ID tự động dựa vào số lượng hiện có
+        User newUser = new User(newUserId, userName, password, "Member", email);
+        users.Add(newUser);
+        Console.WriteLine($"Tạo tài khoản thành công cho người dùng: {userName}");
+    }
+
+    // 2. Phân quyền người dùng
+    public void AssignRole(int userId, string role)
+    {
+        User user = users.Find(u => u.UserId == userId);
+        if (user != null)
+        {
+            user.Role = role;
+            Console.WriteLine($"Phân quyền {role} cho người dùng: {user.UserName}");
+        }
+        else
+        {
+            Console.WriteLine("Không tìm thấy người dùng.");
+        }
+    }
+
+    // 3. Xử lý báo cáo vi phạm
+    public void HandleReports(int userId)
+    {
+        User user = users.Find(u => u.UserId == userId);
+        if (user != null)
+        {
+            // Ví dụ tạm ngừng hoạt động người dùng vi phạm
+            user.IsActive = false;
+            Console.WriteLine($"Người dùng {user.UserName} đã bị khóa tài khoản do vi phạm.");
+        }
+        else
+        {
+            Console.WriteLine("Không tìm thấy người dùng.");
+        }
+    }
+
+    // 4. Hiển thị danh sách người dùng (phục vụ kiểm tra)
+    public void DisplayUsers()
+    {
+        Console.WriteLine("Danh sách người dùng:");
+        foreach (var user in users)
+        {
+            Console.WriteLine($"ID: {user.UserId}, Tên: {user.UserName}, Vai trò: {user.Role}, Trạng thái: {(user.IsActive ? "Hoạt động" : "Bị khóa")}");
+        }
+    }
+}
+
+
